@@ -11,40 +11,8 @@
 
 ## 架构
 
-```
-START
-  │
-  ▼
-┌─────────────────────┐
-│  analyze_structure  │  ← 项目结构分析 Agent (使用 list_dir, read_file 工具)
-└─────────────────────┘
-  │
-  ▼
-┌─────────────────────┐
-│     plan_tasks      │  ← 任务分工 Agent (输出 JSON 任务列表)
-└─────────────────────┘
-  │
-  │ ┌──── Send ────┐ ┌──── Send ────┐
-  ▼ ▼              ▼ ▼              
-┌─────────┐      ┌─────────┐
-│ Worker  │      │ Worker  │  ← 并行 Worker (代码审查 + 测试生成)
-│ Task A  │      │ Task B  │
-└─────────┘      └─────────┘
-  │              │
-  └──────┬───────┘
-         ▼
-┌─────────────────────┐
-│     run_tests       │  ← 测试执行 Agent (pytest/go test/gcc)
-└─────────────────────┘
-         │
-         ▼
-┌─────────────────────┐
-│  generate_report    │  ← 最终报告生成
-└─────────────────────┘
-         │
-         ▼
-        END
-```
+![alt text](complex_workflow_graph.png)
+![alt text](performance_workflow_graph.png)
 
 ## 目录结构
 
@@ -65,6 +33,14 @@ complex_code_review/
     │   └── report_agent.py      # 报告生成
     ├── graph/
     │   └── workflow.py    # LangGraph 工作流定义
+    ├── performance/       # 性能分析子图（热点/内存/动态剖析/优化建议）
+    │   ├── perf_workflow.py      # 性能子图定义（extract_code -> analyze_memory/profile -> detect_hotspots -> generate_optimizations）
+    │   ├── perf_state.py         # 性能子图状态
+    │   ├── code_extractor.py     # 代码结构提取
+    │   ├── memory_analyzer.py    # 内存风险点分析
+    │   ├── profiler_agent.py     # 动态剖析（time/perf 等，终端实时输出 + 指标解析）
+    │   ├── hotspot_detector.py   # 热点定位
+    │   ├── optimization_advisor.py # 优化建议 + 性能报告生成
     ├── state/
     │   └── state.py       # 状态定义 (TypedDict)
     └── tools/
@@ -89,15 +65,35 @@ ollama pull qwen2.5-coder:7b
 
 ### 3. 运行审查
 
+**基本用法**：
+
 ```bash
 python main.py /path/to/your/project
 ```
 
+**完整运行示例**：
+
+包含性能分析 (`--perf`)、动态剖析 (`--profile`)、自定义测试脚本 (`-t`) 以及报告服务 (`--serve`) 的完整命令：
+
+```bash
+python main.py /home/elendilen/workspace/project \\
+  --perf \\
+  --profile \\
+  --exec ./build/project_hw \\
+  --exec-cwd /home/elendilen/workspace/project \\
+  --exec-args "-i dataset/input_random.txt -o dataset/output_random.txt -v dataset/val_random.txt" \\
+  -t "cd /home/elendilen/workspace/project/scripts && bash run.sh" \\
+  --serve
+```
+
+*(注意：示例命令中已修正路径拼写 `worspace` -> `workspace`)*
+
 ### 4. 查看报告
 
-报告将生成在 `reports/` 目录下：
-- `project_structure.md` - 项目结构与功能文档
-- `final_analysis.md` - 综合分析报告
+报告将生成在 `reports/` 目录下（仅保存核心文档）：
+- `project_structure.md` - 项目结构与架构说明
+- `performance_analysis.md` - 深度性能分析报告（仅在启用 --perf 时生成）
+- `style_report.md` - 代码风格检查报告
 
 ## 配置
 
@@ -107,6 +103,7 @@ python main.py /path/to/your/project
 
 ```bash
 python visualize_complex_graph.py
+python visualize_performance_graph.py
 ```
 
-将生成 `complex_workflow_graph.png`。
+将生成 `complex_workflow_graph.png` 和 `performance_workflow_graph.png`。

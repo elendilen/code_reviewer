@@ -241,15 +241,15 @@ CARD_TEMPLATE = """
 
 REPORT_INFO = {
     "project_structure.md": {
-        "title": "项目结构与算法",
+        "title": "项目结构说明",
         "icon": "🏗️",
-        "description": "项目目录结构、核心数据结构和算法实现详解",
-        "badges": '<span class="badge badge-blue">结构</span><span class="badge badge-green">算法</span>'
+        "description": "项目目录结构、核心模块与关键实现概览",
+        "badges": '<span class="badge badge-blue">结构</span>'
     },
     "performance_analysis.md": {
         "title": "性能分析报告",
         "icon": "⚡",
-        "description": "性能热点分析、复杂度评估和优化建议",
+        "description": "热点分析、内存风险点与优化建议（可结合动态剖析指标）",
         "badges": '<span class="badge badge-yellow">性能</span><span class="badge badge-green">优化</span>'
     },
     "style_report.md": {
