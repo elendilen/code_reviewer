@@ -21,9 +21,6 @@ complex_code_review/
 ├── main.py                 # 入口文件
 ├── requirements.txt
 ├── reports/                # 生成的报告目录
-├── tests/
-│   ├── system/            # 系统自动生成的测试
-│   └── user/              # 用户自定义测试
 └── src/
     ├── agents/            # 智能代理
     │   ├── structure_agent.py   # 项目结构分析
@@ -71,22 +68,56 @@ ollama pull qwen2.5-coder:7b
 python main.py /path/to/your/project
 ```
 
-**完整运行示例**：
-
-包含性能分析 (`--perf`)、动态剖析 (`--profile`)、自定义测试脚本 (`-t`) 以及报告服务 (`--serve`) 的完整命令：
-
 ```bash
-python main.py /home/elendilen/workspace/project \\
-  --perf \\
-  --profile \\
-  --exec ./build/project_hw \\
-  --exec-cwd /home/elendilen/workspace/project \\
-  --exec-args "-i dataset/input_random.txt -o dataset/output_random.txt -v dataset/val_random.txt" \\
-  -t "cd /home/elendilen/workspace/project/scripts && bash run.sh" \\
-  --serve
-```
+usage: main.py [-h] [-t TEST_COMMANDS] [--test-dir TEST_DIR] [--perf] [--profile]
+               [--exec PROFILING_EXECUTABLE] [--exec-arg PROFILING_EXEC_ARGS]
+               [--exec-args PROFILING_EXEC_ARGS_STR] [--exec-cwd PROFILING_CWD] [--serve] [--port PORT]
+               [-q]
+               project_path
 
-*(注意：示例命令中已修正路径拼写 `worspace` -> `workspace`)*
+Complex Code Review System V2 - 代码审查与测试分析系统
+
+positional arguments:
+  project_path          要审查的项目路径
+
+options:
+  -h, --help            show this help message and exit
+  -t, --test TEST_COMMANDS
+                        自定义测试命令（可多次使用）
+  --test-dir TEST_DIR   测试目录路径（运行其中所有脚本）
+  --perf                启用深度性能分析（热点检测、内存分析、优化建议）
+  --profile             启用动态性能剖析（需要可执行文件；可用 --exec/--exec-arg 指定运行方式）
+  --exec PROFILING_EXECUTABLE
+                        动态剖析时指定可执行文件路径（默认自动在项目中查找）
+  --exec-arg PROFILING_EXEC_ARGS
+                        动态剖析时传给可执行文件的参数（可多次使用）
+  --exec-args PROFILING_EXEC_ARGS_STR
+                        动态剖析时传给可执行文件的参数字符串（会用 shlex 拆分）
+  --exec-cwd PROFILING_CWD
+                        动态剖析运行工作目录（默认项目根目录）
+  --serve               审查完成后启动 Web 服务器查看报告
+  --port PORT           Web 服务器端口 (默认: 8080)
+  -q, --quiet           安静模式，不渲染中间结果
+
+示例用法:
+  # 基本审查（无测试）
+  python main.py /path/to/project
+
+  # 指定测试命令
+  python main.py /path/to/project -t "make test" -t "./run_tests.sh"
+
+  # 指定测试目录（运行目录中所有脚本）
+  python main.py /path/to/project --test-dir scripts/
+
+  # 启用深度性能分析
+  python main.py /path/to/project --perf
+
+  # 完整分析（性能分析 + 动态剖析）
+  python main.py /path/to/project --perf --profile
+
+  # 审查完成后启动 Web 服务器查看报告
+  python main.py /path/to/project --perf --serve
+```
 
 ### 4. 查看报告
 
