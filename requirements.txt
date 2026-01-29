@@ -1,0 +1,16 @@
+# Complex Code Review System V2 - Dependencies
+
+# Core LangGraph Framework
+langgraph>=0.2.0
+langgraph-checkpoint>=2.0.0
+
+# LangChain Ecosystem
+langchain-core>=0.3.0
+langchain-ollama>=0.2.0
+
+# Ollama
+ollama>=0.3.0
+
+# Utilities
+pydantic>=2.0.0
+python-dotenv>=1.0.0
